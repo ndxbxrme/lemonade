@@ -1,0 +1,229 @@
+html
+  head
+    meta(charset='utf-8')
+  body(style='background:#222222')
+    - var wavTypes = ['Reference','Kick','Snare','Hat','Crash','Percussion','Bass','Loop','Melodic','Drone','Convolver','Impulse']
+    - var graphTypes = ['Form','Inner Form','Dynamics','Stability','Gain','Busyness','Halftime','🥒Pickle Factor']
+    canvas.thumbnail
+    script#file-item(type='text/template').
+      .file-item(id='f_' + file.name.replace(/[^\w_-]/g, 'xx'))
+        a(class=ProjectManager.fileClass(file.name), onclick='ProjectManager.selectFile("' + file.name + '")')
+          label
+            span= file.name
+          img(src=file.b64)
+    script#region-item(type='text/template').
+      .region-item
+        a(class=ProjectManager.regionClass(region), onclick='ProjectManager.selectRegion(this)')
+          span= region.start
+    script#graph-item(type='text/template').
+      .graph-item(id='g_' + graph.replace(/[^\w_-]/g, 'xx'))
+        a(onclick='ProjectManager.selectGraph("' + graph + '")')
+          label
+            span= graph
+          canvas
+    script#modal-load-zip(type='text/template').
+      .modal-content
+        button(onclick='ProjectManager.openZip()') Open project
+        button(onclick='ProjectManager.mergeZip()') Merge into current
+        button(onclick='ProjectManager.importWaves()') Import Waves
+        button(onclick='ProjectManager.cancel()') Cancel
+    script#modal-welcome(type='text/template').
+      .modal-content
+        h1 Are you ready?
+        .welcome-options
+          .option
+            a(onclick='ProjectManager.newProject()') New Project
+          .option
+            span Open zip
+            input(type='file', onchange='ProjectManager.openZip(this)', accept='application/zip')
+    script#modal-graph-select(type='text/template').
+      .modal-content
+        select.graph-select()
+          each graph in graphs
+            option= graph
+        input.multiplier(type='number', step='0.01', value='-1')
+        input.offset(type='number', step='0.01', value='-1')
+        .controls
+          button.ok(onclick='ProjectManager.submit()') OK
+          button.cancel(onclick='ProjectManager.cancel()') Cancel
+    script#brain-graph(type='text/template').
+      .item.graph(class=name)
+        label= tag
+        .value
+          span
+          input.form.mult(type='number')
+          input.form.offset(type='number')
+    .header
+      h1 🍾♻️&#x1f34b;Lemonade
+        span.back 🍾♻️&#x1f34b;
+      .project-controls
+        .control-row
+          .item
+            label 🗿 Project name
+            input#name(type='text')
+          .item
+            label 🌱 Seed
+            input#seed(type='number', value=260, onchange='ProjectManager.setSeed(this.value)')
+        .control-row
+          input#id(type='hidden')
+          button(onclick='ProjectManager.new()') 🧼 New project
+          button(onclick='ProjectManager.save()') 🧵 Save project
+          //button(onclick='ProjectManager.load()') Load
+          .load-zip
+            span 🤐 Load zip
+            input(type='file', multiple=true, accept='application/zip', onchange='ProjectManager.chooseFile(this)')
+          //.merge-zip
+            span Merge zip
+            input(type='file', multiple=true, accept='application/zip', onchange='ProjectManager.mergeZip(this)')
+          button(onclick='ProjectManager.doZip()') 🤐 Save zip
+          //button(onclick='ProjectManager.newGraph()') New Graph
+          //input(type='file', onchange='ProjectManager.chooseFile(this)', multiple='true', accept='audio/*')
+          //button(onclick='ProjectManager.renderScript()') Render
+          //button(onclick='Brain.think()') Think
+          button(onclick='ProjectManager.setState("brain")') 🧠 Brain
+    .body
+      .drawer
+        .tabs
+          a.files(onclick='ProjectManager.setDrawerState("files")') Waveforms
+          a.graphs(onclick='ProjectManager.setDrawerState("graphs")') Graphs
+        .file-list-holder
+          .file-add
+            span 🎧 Add audio file
+            input(type='file', multiple=true, accept='audio/*', onchange='ProjectManager.chooseFile(this)')
+          .file-filter
+            select(onchange='ProjectManager.renderFileList()')
+              option All
+              each type in wavTypes
+                option= type
+          .file-list
+        .graph-list-holder
+          .graph-add(onclick='ProjectManager.newGraph()') 
+            span 📈 Add graph
+          .graph-filter
+            select(onchange='ProjectManager.renderGraphList()')
+              option All
+              each type in graphTypes
+                option= type
+          .graph-list
+        .region-list
+      .page
+        .brain
+          .pics
+            img(src='https://vignette.wikia.nocookie.net/topcat/images/5/50/Topcat002-1-.gif/revision/latest?cb=20110424163028')
+            img(src='https://i.pinimg.com/originals/5d/9f/76/5d9f76d50a17e38fdd5be4d22e6a17dc.png')
+        .waveditor
+          input.name(type='text')
+          button(onclick='editor.renderScript()') Render
+          button.editor-play(onclick='editor.play()') ▶️ Play
+          button.editor-stop(onclick='editor.stop()') ⏹️ Stop
+          input#loop(type='checkbox')
+          label(for='loop') Loop
+          button(onclick='editor.setLoopStart()') Set loop start
+          button(onclick='editor.saveWaveform()') Save waveform
+          button(onclick='editor.saveFile()') Save file
+          button(onclick='ProjectManager.deleteWaveform()') Delete waveform
+          button(onclick='ProjectManager.renameWaveform()') 🗿 Rename waveform
+          button(onclick='editor.zoomToSelection()') Zoom to selection
+          button(onclick='editor.zoomIn()') Zoom in
+          button(onclick='editor.zoomOut()') Zoom out
+          button(onclick='editor.zoomFull()') Reset zoom
+          button(onclick='editor.normalize()') 🦆 Normalize
+          button(onclick='editor.extractSelection()') Extract selection
+          label xfade
+          input.xfade(type='number', value=0, step=1)
+          button(onclick='editor.extractChannel(0)') Extract L
+          button(onclick='editor.extractChannel(1)') Extract R
+          button(onclick='editor.deleteSelection()') Delete selection
+          button(onclick='editor.mute()') Mute
+          button(onclick='editor.fadeIn()') Fade in
+          button(onclick='editor.fadeOut()') Fade out
+          button(onclick='editor.reverse()') Reverse
+          button(onclick='editor.swapChannels()') Swap channels
+          button(onclick='editor.gainFromGraph()') Gain from graph
+          button(onclick='editor.waveshapeFromGraph()') Waveshape from graph
+          button(onclick='editor.undo()') Undo
+          button(onclick='editor.redo()') Redo
+          button(onclick='editor.cursorToStart()') Cursor to start
+          button(onclick='editor.cursorToEnd()') Cursor to end
+          button(onclick='editor.resize()') Resize
+          label Resize factor
+          input.resize-factor(type='number', value=1, step=0.0001)
+          button(onclick='editor.declack()') Declack
+          button(onclick='editor.smooth()') Smooth
+          label Smooth factor
+          input.smooth-factor(type='number', value=0.1, step=0.0001)
+          .waveform-holder(onscroll='editor.scroll()')
+            .waveform-inner(onclick='editor.click()', onmousedown='editor.mouseDown()', onmouseup='editor.mouseUp()', onmousemove='editor.mouseMove()', onmouseout='editor.mouseOut()', onmousewheel='editor.mouseWheel()', oncontextmenu='event.preventDefault()')
+              .cursor
+              .selection
+              canvas
+            .padding
+          .info
+            .waveform-info
+              .duration
+              .samples
+            .selection-info
+              .start
+              .duration
+              .samples
+              .hz
+          .text-and-category
+            textarea.script.
+            //select.tags(multiple=true)
+              each type in wavTypes
+                option= type
+        .editor
+          canvas(onclick='ProjectManager.playSelectedFile()')
+          textarea#script.
+            normalize()
+            analyze()
+          textarea#io
+        .graph-editor
+          .buttons
+            button(onclick='ProjectManager.saveGraph()') 🚒 Save Graph
+            button.graph-play(onclick='ProjectManager.playGraph()') ▶️ Play Graph
+            button.graph-stop(onclick='ProjectManager.stopGraph()') ⏹️ Stop Graph
+            input.graph-startpos(type='number', value='0', step='0.01')
+            input#graph-loop(type='checkbox')
+            label(for='graph-loop') Loop
+            button(onclick='ProjectManager.renderGraphToWaveform()') 🎨 Render Graph to Waveform
+            button(onclick='ProjectManager.deleteGraph()') 💥 Delete Graph
+            button(onclick='ProjectManager.renameGraph()') 🗿 Rename Graph
+          .settings
+            .setting.quarter
+              label name
+              input.name(type='text', value='undefined')
+            .setting.quarter
+              label range
+              input.range(type='text', value='{"h":[0,1],"v":[0,1]}', onchange='ProjectManager.renderGraph()', onkeyup='ProjectManager.renderGraph()')
+            .setting.quarter
+              label multiplier
+              input.multiplier(type='number', value='1', step='0.01', onchange='ProjectManager.renderGraph()')
+            .setting.quarter
+              label offset
+              input.offset(type='number', value='0', step='0.01', onchange='ProjectManager.renderGraph()')
+            .setting.quarter
+              label tempo
+              input.tempo(type='number', value='60', step='0.01', onchange='ProjectManager.renderGraph()')
+            .setting.quarter
+              label beats
+              input.beats(type='text', value='1', step='0.01', onchange='ProjectManager.renderGraph()')
+          .graph-holder(onscroll='editor.scroll()')
+            .graph-inner(onclick='ProjectManager.graphClick()')
+              .cursor
+              .selection
+              canvas
+            .padding
+          .rendered
+            .render-start
+            .render-end
+          .text-and-category
+            textarea.fn(onchange='ProjectManager.renderGraph()', onkeyup='ProjectManager.renderGraph()').
+            //select.tags(multiple=true)
+              each type in graphTypes
+                option= type
+          .graph-error
+    script(src='./lemon-tools.js')
+    script.
+      require('./renderer.js')
+

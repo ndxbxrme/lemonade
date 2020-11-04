@@ -1,0 +1,3 @@
+Brain = ->
+  
+module.exports = Brain

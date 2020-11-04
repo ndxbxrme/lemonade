@@ -1,0 +1,336 @@
+@import './components/**/*'
+html, body
+  font-family sans-serif
+
+html, body
+  display flex
+  flex-direction column
+  max-height 100%
+  overflow hidden
+  font-size .9em
+  color #eee
+  background #222
+  height 100%
+input[type=file], input[type=file]::-webkit-file-upload-button
+  cursor pointer
+input
+  background #111
+  color #eee
+  border 1px solid #000
+canvas.thumbnail
+  border 1px solid black
+  width 256px
+  height 64px
+  position absolute
+  top -400em
+textarea
+  width 100%
+  height 10em
+  background #111
+  color #eee
+textarea, input
+  padding .5em
+  box-sizing border-box
+button
+  padding .5em
+  border 1px solid #000
+  border-radius .3em
+  background #111
+  box-shadow inset 0 0 5px 0px #00000080
+  cursor pointer
+  color #eee
+  &:hover
+    background black
+  &:active
+    background orange
+.file-add, .graph-add, .load-zip, .merge-zip
+  text-align center
+  position relative
+  padding .5em
+  border 1px solid #000
+  border-radius .3em
+  background #111
+  color #eee
+  box-shadow inset 0 0 5px 0px #00000080
+  margin-bottom .5em
+  cursor pointer
+  &:hover
+    background black
+  &:active
+    background orange
+  input[type=file]
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    z-index 3
+    opacity 0
+    cursor pointer!important
+.header
+  display none
+  h1
+    text-align center
+.brain
+  display flex
+  .controls
+    margin 0 0 1em 0
+  .brain-inner
+    flex 1
+    display flex
+    flex-direction column
+    .details
+      .item
+        display flex
+        align-items baseline
+        label
+          width 7em
+          padding .5em 0
+        .value
+          input
+            width 6em
+.project-controls
+  display flex
+  flex-direction column
+  align-items center
+  padding-bottom 1em
+  border-bottom 1px solid #ccc
+  .control-row
+    display flex
+    .item
+      display flex
+      flex-direction column
+      #seed
+        width 7em
+.modal-holder
+  top 0
+  h1
+    margin .5em 0
+    text-align center
+    font-size 1.4em
+  .welcome-options
+    display flex
+    margin-bottom 1em
+    .option
+      flex 1
+      position relative
+      padding 2em
+      input[type=file]
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        opacity 0
+        z-index 3
+.back
+  display inline-block
+  transform scaleX(-1)
+.body
+  .drawer
+    margin-top 1em
+    overflow-y auto
+    flex 1
+    min-width 12em
+    position relative
+    .tabs
+      display flex
+      a
+        flex 1
+        padding .5em
+        cursor pointer
+        &:hover
+          opacity 1
+    .file-list-holder, .graph-list-holder
+      flex-direction column
+    .file-list, .graph-list
+      display flex
+      flex-direction column
+      width 100%
+      max-width 100%
+      font-size .9em
+      a
+        label
+          white-space nobreak
+        display flex
+        flex-direction column
+        canvas
+          height 2em
+        img
+          width 100%
+  display flex
+  flex 1
+  position relative
+  overflow hidden
+  .page
+    margin-left 1em
+    margin-top 1em
+    width 100%
+  .editor
+    display none
+  .text-and-category
+    display flex
+    position relative
+    flex 1
+    select
+      option
+        padding-right 2em
+  .graph-editor
+    display flex
+    flex-direction column
+    canvas
+      width 100%
+      height 12em
+    .graph-holder
+      overflow-x hidden
+    .CodeMirror
+      height 100%
+      position absolute
+      top 0
+      left 0
+      width 100%
+    h1
+      margin 0
+    .settings
+      display flex
+      .setting
+        input
+          width 100%
+    .half
+      width 60%
+    .quarter
+      width 20%
+.waveditor
+  opacity 0
+  pointer-events none
+  input[type=number]
+    width 4em
+  canvas
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+  .info
+    display flex
+    justify-content space-between
+    .waveform-info, .selection-info
+      display flex
+    .waveform-info
+      div
+        margin-right 1em
+    .selection-info
+      div
+        margin-left 1em
+.waveform-holder, .graph-holder
+  position relative
+  height 12 em
+  overflow-x scroll
+  .waveform-inner, .graph-inner
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+  .selection
+    position absolute
+    top 0
+    left 0%
+    width 0%
+    background black
+    height 100%
+    opacity 0.4
+    pointer-events none
+    z-index 39
+  .cursor
+    position absolute
+    top 0
+    left 0%
+    width 1px
+    height 100%
+    background black
+    pointer-events none
+    z-index 40
+  .padding
+    pointer-events none
+    display inline-block
+.haswaveform
+  .waveditor
+    opacity 1
+    pointer-events all
+.stategraph
+  .graph-editor
+    height 100%
+  .waveditor
+    height 0
+    overflow hidden
+  .brain
+    height 0
+    overflow hidden
+.statewaveform
+  .graph-editor
+    height 0
+    overflow hidden
+  .waveditor
+    height auto
+  .brain
+    height 0
+    overflow hidden
+.statebrain
+  .graph-editor
+    height 0
+    overflow hidden
+  .waveditor
+    height 0
+    overflow hidden
+  .brain
+    height auto
+.drawerstatefiles
+  .graph-list-holder
+    height 0
+    overflow hidden
+  .file-list-holder
+    height auto
+  .drawer
+    .graphs
+      opacity .4
+.drawerstategraphs
+  .graph-list-holder
+    height auto
+  .file-list-holder
+    height 0
+    overflow hidden
+  .files
+    opacity .4
+.graph-filter, .file-filter
+  display none
+.rendered
+  position relative
+  height .3em
+  .render-start, .render-end
+    position absolute
+    top 0
+    bottom 0
+    background #42428a
+&.working
+  .drawer, .page, .project-controls
+    opacity .4
+    pointer-events none
+    
+.brain-stop, .editor-stop, .graph-stop
+  display none
+.seq-playing
+  .brain-play
+    display none
+  .brain-stop
+    display inline
+.editor-playing
+  .editor-play
+    display none
+  .editor-stop
+    display inline
+.graph-playing
+  .graph-play
+    display none
+  .graph-stop
+    display inline

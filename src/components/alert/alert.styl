@@ -1,0 +1,14 @@
+.alert
+  position fixed
+  top 1em
+  right 1em
+  z-index 4000
+  background black
+  color white
+  padding 1em
+  transition transform .2s
+  &.hidden
+    transform translateY(-200%)
+  &.visible
+    transform translateY(0)
+  
