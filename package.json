@@ -1,14 +1,22 @@
 {
   "name": "lemonade",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "",
   "main": "app/main.js",
   "scripts": {
     "bam": "cd ../audio/lemon-tools && npm run build && cd ../../lemonade && cp ../audio/lemon-tools/dist/lemon-tools.js app/lemon-tools.js",
     "build": "rm -rf app && coffee -o app src/main.coffee && coffee -o app src && npm run bam &&  webpack --config webpack.prod.js",
     "start": "npm run build && electron .",
-    "pack": "npm run build && build --win -p always",
+    "pack": "npm run build && electron-builder --win -p always",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.rainstormweb.lemonade",
+    "productName": "lemonade"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ndxbxrme/lemonade"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +47,7 @@
     "codemirror": "^5.58.1",
     "electron-updater": "^4.3.5",
     "file-saver": "^2.0.2",
+    "fs-extra": "^9.0.1",
     "jszip": "^3.5.0",
     "pitchfinder": "^2.3.1",
     "pug": "^3.0.0"
