@@ -625,6 +625,11 @@
         pushUndo();
         return redraw();
       },
+      rectify: async function() {
+        await waveform.rectify();
+        pushUndo();
+        return redraw();
+      },
       topDeck: async function() {
         await waveform.topDeck();
         pushUndo();

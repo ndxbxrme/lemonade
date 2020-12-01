@@ -43,6 +43,8 @@ button
     background black
   &:active
     background orange
+.hide
+  display none
 .file-add, .graph-add, .load-zip, .merge-zip
   text-align center
   position relative
@@ -194,8 +196,11 @@ button
     .settings
       display flex
       .setting
-        input
+        input[type=text], input[type=number]
           width 100%
+        .thing
+          display flex
+          align-items center
     .half
       width 60%
     .quarter

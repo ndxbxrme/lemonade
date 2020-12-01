@@ -81,10 +81,11 @@
       "h": [0, 1],
       "v": [-0.1, 1.1]
     }, tempo = 60, beats = 1) {
-    var analyzeWaveform, audio, canvas, filterData, fn, hash, innerfn, loadAudioFile, loadWaveTable, notes, time, util;
+    var analyzeWaveform, audio, barNo, canvas, filterData, fn, hash, innerfn, loadAudioFile, loadWaveTable, notes, preDone, storage, time, util;
     noise.reset();
     canvas = null;
     time = 0;
+    barNo = 0;
     audio = null;
     filterData = {};
     notes = {};
@@ -130,7 +131,21 @@
       }
       return h;
     };
+    preDone = false;
+    storage = {};
     util = {
+      preprocess: function(fn) {
+        if (!preDone) {
+          fn.call(this);
+          return preDone = true;
+        }
+      },
+      set: function(name, val) {
+        return storage[name] = val;
+      },
+      get: function(name) {
+        return storage[name];
+      },
       f: function(freq, nobeats) {
         return freq * (60 / tempo) * (nobeats || beats);
       },
@@ -199,7 +214,7 @@
           count++;
         }
         x = x + count * steplength;
-        return [Math.min(1, Math.max(0, x > 1 ? 0 : x)), cell - count < 0 ? cell - count + nosteps : cell - count, fn(cell + 1) ? this.clamp((1 - stepx) * 100, 0, 1) : 1];
+        return [Math.min(1, Math.max(0, x > 1 ? 0 : x)), cell - count < 0 ? cell - count + nosteps : cell - count, Math.min((fn(cell + 1) ? this.clamp((1 - stepx) * 100, 0, 1) : 1), (cell === start ? Math.min(x * 1000, 1) : 1)), x < .1];
       },
       adr: function(x, a, d, r) {
         return this.clamp(Math.pow(1 - (x - d), r), 0, 1) * Math.sin((this.clamp(x, 0, a)) * Math.PI * 2 * 1 / a * .25);
@@ -244,12 +259,15 @@
         return val.map((item) => {
           return item; // * @clamp((rlen - x) * 100, 0, 1)
         });
+      },
+      draw: function() {
+        return 0;
       }
     };
-    innerfn = new Function("x,noise,util,seed,time,notesByMIDINo,notesByName", text);
+    innerfn = new Function("x,noise,util,seed,time,barNo,notesByMIDINo,notesByName", text);
     fn = function(_multiplier = multiplier, _offset = offset) {
-      return function(x, noise, util, seed, time, notesByMIDINo, notesByName) {
-        return innerfn(x, noise, util, seed, time, notesByMIDINo, notesByName) * +_multiplier + +_offset;
+      return function(x, noise, util, seed, time, barNo, notesByMIDINo, notesByName) {
+        return innerfn(x, noise, util, seed, time, barNo, notesByMIDINo, notesByName) * +_multiplier + +_offset;
       };
     };
     return {
@@ -271,6 +289,9 @@
       setTime: function(_time) {
         return time = _time;
       },
+      setBarNo: function(_barNo) {
+        return barNo = _barNo;
+      },
       getText: function() {
         return text;
       },
@@ -290,7 +311,7 @@
         return beats;
       },
       getValue: function(x) {
-        return fn()(x, noise, util, 200, time, Notes.byMIDINo, Notes.byName);
+        return fn()(x, noise, util, 200, time, barNo, Notes.byMIDINo, Notes.byName);
       },
       toBase64: function() {
         return btoa(JSON.stringify({

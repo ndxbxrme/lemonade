@@ -452,6 +452,10 @@ Editor = (audio) ->
     await waveform.normalize()
     pushUndo()
     redraw()
+  rectify: ->
+    await waveform.rectify()
+    pushUndo()
+    redraw()
   topDeck: ->
     await waveform.topDeck()
     pushUndo()

@@ -32,6 +32,31 @@ Waveform = (audio) ->
         i++
       buffer.copyToChannel data, c
       c++
+  rectify: ->
+    data = new Float32Array buffer.length
+    c = 0
+    swing = 8
+    while c < buffer.numberOfChannels
+      buffer.copyFromChannel data, c
+      i = 0
+      offset = 0
+      while i < buffer.length
+        min = 1
+        max = -1
+        b = i
+        while b < i + 100 and b < buffer.length
+          smp = data[b]
+          min = Math.min smp, min
+          max = Math.max smp, max
+          b++
+        nextOffset = min + (max - min) * .5
+        diff = nextOffset - offset
+        diff /= swing
+        offset = offset + diff
+        data[i] += offset
+        i++
+      buffer.copyToChannel data, c
+      c++
   trim: ->
     trimStart = buffer.length
     trimEnd = 0

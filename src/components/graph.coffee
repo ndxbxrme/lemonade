@@ -50,6 +50,7 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
   noise.reset()
   canvas = null
   time = 0
+  barNo = 0
   audio = null
   filterData = {}
   notes = {}
@@ -80,7 +81,17 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
     while i
       h = (h * 33) ^ str.charCodeAt --i
     h
+  preDone = false
+  storage = {}
   util =
+    preprocess: (fn) ->
+      if not preDone
+        fn.call @
+        preDone = true
+    set: (name, val) ->
+      storage[name] = val
+    get: (name) ->
+      storage[name]
     f: (freq, nobeats) ->
       freq * (60 / tempo) * (nobeats or beats)
     wt: (name, x) ->
@@ -126,7 +137,8 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
       [
         Math.min(1, Math.max(0, if x > 1 then 0 else x))
         if cell - count < 0 then cell - count + nosteps else cell - count
-        if fn cell + 1 then @clamp((1 - stepx) * 100, 0, 1) else 1
+        Math.min((if fn cell + 1 then @clamp((1 - stepx) * 100, 0, 1) else 1), (if cell is start then Math.min(x * 1000, 1) else 1))
+        x < .1
       ]
     adr: (x, a, d, r) ->
       @clamp(Math.pow(1 - (x - d), r), 0, 1) * Math.sin((@clamp(x, 0, a)) * Math.PI * 2 * 1 / a * .25)
@@ -161,8 +173,9 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
       #console.log 'r', x, @clamp((rlen - x) * 100, 0, 1)
       val = wf.getValueAtTime(x + rstart)
       val.map (item) => item# * @clamp((rlen - x) * 100, 0, 1)
-  innerfn = new Function "x,noise,util,seed,time,notesByMIDINo,notesByName", text
-  fn = (_multiplier=multiplier, _offset=offset) -> (x, noise, util, seed, time, notesByMIDINo, notesByName) -> innerfn(x, noise, util, seed, time, notesByMIDINo, notesByName) * +_multiplier + +_offset  
+    draw: -> 0
+  innerfn = new Function "x,noise,util,seed,time,barNo,notesByMIDINo,notesByName", text
+  fn = (_multiplier=multiplier, _offset=offset) -> (x, noise, util, seed, time, barNo, notesByMIDINo, notesByName) -> innerfn(x, noise, util, seed, time, barNo, notesByMIDINo, notesByName) * +_multiplier + +_offset  
   ###
   wavetablesToLoad = (text.match(/wt\(\s*['"].*?['"]/g) or []).map((item) -> item.replace(/wt\(\s*|['"]/g, ''))
   if wavetablesToLoad.length
@@ -177,6 +190,7 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
   fn: fn
   setCanvas: (_canvas) -> canvas = _canvas
   setTime: (_time) -> time = _time
+  setBarNo: (_barNo) -> barNo = _barNo
   getText: -> text
   getMultiplier: -> multiplier
   getOffset: -> offset
@@ -184,7 +198,7 @@ Graph = (text='return x', multiplier=1, offset=0, range={"h":[0,1],"v":[-0.1,1.1
   getTempo: -> tempo
   getBeats: -> beats
   getValue: (x) ->
-    fn() x, noise, util, 200, time, Notes.byMIDINo, Notes.byName
+    fn() x, noise, util, 200, time, barNo, Notes.byMIDINo, Notes.byName
   toBase64: ->
     btoa JSON.stringify
       text: text

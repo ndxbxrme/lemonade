@@ -47,6 +47,38 @@
         }
         return results;
       },
+      rectify: function() {
+        var b, c, data, diff, i, max, min, nextOffset, offset, results, smp, swing;
+        data = new Float32Array(buffer.length);
+        c = 0;
+        swing = 8;
+        results = [];
+        while (c < buffer.numberOfChannels) {
+          buffer.copyFromChannel(data, c);
+          i = 0;
+          offset = 0;
+          while (i < buffer.length) {
+            min = 1;
+            max = -1;
+            b = i;
+            while (b < i + 100 && b < buffer.length) {
+              smp = data[b];
+              min = Math.min(smp, min);
+              max = Math.max(smp, max);
+              b++;
+            }
+            nextOffset = min + (max - min) * .5;
+            diff = nextOffset - offset;
+            diff /= swing;
+            offset = offset + diff;
+            data[i] += offset;
+            i++;
+          }
+          buffer.copyToChannel(data, c);
+          results.push(c++);
+        }
+        return results;
+      },
       trim: function() {
         var c, data, end, i, results, start, trimEnd, trimStart;
         trimStart = buffer.length;

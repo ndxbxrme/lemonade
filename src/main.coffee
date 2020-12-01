@@ -1,9 +1,10 @@
-{app, BrowserWindow, Menu, ipcMain, dialog} = require 'electron'
+{app, BrowserWindow, Menu, Notification, ipcMain, dialog} = require 'electron'
 {autoUpdater} = require 'electron-updater'
 fs = require 'fs-extra'
 url = require 'url'
 path = require 'path'
 Graph = require './components/graph'
+encoder = require './components/encoder/encoder'
 
 mainWindow = null
 newProject = -> mainWindow.webContents.send 'newProject'
@@ -45,6 +46,17 @@ ready = ->
       label: 'Waveform'
       click: showWaveform
     ]
+  ,
+    label: 'Tools'
+    submenu: [
+      label: 'Convert Video folder'
+      click: ->
+        await encoder.convertVideoFolder()
+        new Notification
+          title: 'Lemonade'
+          body: 'Finished processing'
+        .show()
+    ]
   ]
   Menu.setApplicationMenu applicationMenu
   if await fs.exists settingsPath
@@ -78,7 +90,7 @@ renderStart = 0
 renderEnd = 0
 nosmps = 0
 rendering = false
-stride = 1024
+stride = 4096
 buffer = new Float32Array(stride)
 waveforms = []
 reset = true
@@ -86,6 +98,7 @@ doRender = ->
   if renderPos > renderEnd
     console.log 'stopping render'
     rendering = false
+    mainWindow.send 'finishedRender'
     return
   startPos = renderPos
   try
@@ -98,16 +111,18 @@ doRender = ->
     setTimeout doRender
   catch e
     console.log 'error', e
+    mainWindow.send 'finishedRender'
     rendering = false
 ipcMain.on 'startRender', (win, data) ->
   return if data.b64 is lastB64
   lastb64 = data.b64
   graph = await Graph.fromBase64 data.b64
   graph.setWaveforms data.waveforms or waveforms
+  graph.setBarNo data.bar or 0
   waveforms = data.waveforms if data.waveforms
   renderStart = data.position
   renderPos = renderStart
-  renderEnd = renderStart + data.nosmps
+  renderEnd = data.end or renderStart + data.nosmps
   nosmps = data.nosmps
   reset = true
   console.log 'start render', graph.getText(), rendering

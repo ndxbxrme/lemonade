@@ -27,16 +27,22 @@
     return ProjectManager.onRendered(data);
   });
 
+  ipcRenderer.on('finishedRender', function(win, data) {
+    return ProjectManager.finishedRender();
+  });
+
   ipcRenderer.on('show', function(win, data) {
     return ProjectManager.setState(data.state);
   });
 
-  ProjectManager.setRenderFn(function(b64, waveforms, position, nosmps) {
+  ProjectManager.setRenderFn(function(b64, waveforms, position, end, nosmps, bar) {
     return ipcRenderer.send('startRender', {
       b64: b64,
       waveforms: waveforms,
       position: position,
-      nosmps: nosmps
+      end: end,
+      nosmps: nosmps,
+      bar: bar
     });
   });
 

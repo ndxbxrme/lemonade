@@ -128,6 +128,7 @@ html
           button(onclick='editor.zoomOut()') Zoom out
           button(onclick='editor.zoomFull()') Reset zoom
           button(onclick='editor.normalize()') 🦆 Normalize
+          button(onclick='editor.rectify()') 🦆 Rectify
           button(onclick='editor.extractSelection()') Extract selection
           label xfade
           input.xfade(type='number', value=0, step=1)
@@ -189,17 +190,19 @@ html
             button(onclick='ProjectManager.renderGraphToWaveform()') 🎨 Render Graph to Waveform
             button(onclick='ProjectManager.deleteGraph()') 💥 Delete Graph
             button(onclick='ProjectManager.renameGraph()') 🗿 Rename Graph
+            input#render-lock(type='checkbox')
+            label(for='render-lock') Render Lock
           .settings
             .setting.quarter
               label name
               input.name(type='text', value='undefined')
-            .setting.quarter
+            .setting.quarter.hide
               label range
               input.range(type='text', value='{"h":[0,1],"v":[0,1]}', onchange='ProjectManager.renderGraph()', onkeyup='ProjectManager.renderGraph()')
             .setting.quarter
               label multiplier
               input.multiplier(type='number', value='1', step='0.01', onchange='ProjectManager.renderGraph()')
-            .setting.quarter
+            .setting.quarter.hide
               label offset
               input.offset(type='number', value='0', step='0.01', onchange='ProjectManager.renderGraph()')
             .setting.quarter
@@ -208,6 +211,12 @@ html
             .setting.quarter
               label beats
               input.beats(type='text', value='1', step='0.01', onchange='ProjectManager.renderGraph()')
+            .setting.quarter
+              label bar no
+              .thing
+                input.barNo(type='number', value='1', step='1', onchange='ProjectManager.renderGraph()')
+                span &#128274;
+                input.barLock(type='checkbox')
           .graph-holder(onscroll='editor.scroll()')
             .graph-inner(onclick='ProjectManager.graphClick()')
               .cursor

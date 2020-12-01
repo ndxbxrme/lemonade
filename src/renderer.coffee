@@ -10,7 +10,9 @@ ipcRenderer.on 'loadProject', (win, data) ->
 ipcRenderer.on 'saveProject', -> ProjectManager.doZip()
 ipcRenderer.on 'rendered', (win, data) ->
   ProjectManager.onRendered data
+ipcRenderer.on 'finishedRender', (win, data) ->
+  ProjectManager.finishedRender()
 ipcRenderer.on 'show', (win, data) ->
   ProjectManager.setState data.state
-ProjectManager.setRenderFn (b64, waveforms, position, nosmps) ->
-  ipcRenderer.send 'startRender', b64: b64, waveforms: waveforms, position: position, nosmps: nosmps
+ProjectManager.setRenderFn (b64, waveforms, position, end, nosmps, bar) ->
+  ipcRenderer.send 'startRender', b64: b64, waveforms: waveforms, position: position, end: end, nosmps: nosmps, bar: bar
